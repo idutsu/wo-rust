@@ -1,0 +1,11 @@
+[package]
+name = "wo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sudachi = { path = "./sudachi.rs/sudachi" } 
+rayon = "1.10.0"
+memchr = "2.7.1"
+memmap2 = "0.9"
+wana_kana = "3.0"
