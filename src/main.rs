@@ -392,9 +392,9 @@ impl SudachiAnalyzer {
 }
 
 fn main() {
-    println!("📦 辞書を読み込んでいます。少々お待ちください...");
+    println!("📦 辞書を読み込んでいます...");
     let analyzer = SudachiAnalyzer::load_dictionary();
-    println!("\n✅準備完了！");
+    println!("\n準備完了！");
     loop {
         print!("> ");
         io::stdout().flush().unwrap();
