@@ -11,9 +11,6 @@ use sudachi::dic::dictionary::JapaneseDictionary;
 use sudachi::prelude::*;
 use wana_kana::ConvertJapanese;
 
-// ==========================================
-// 1. クラス（構造体）の定義
-// ==========================================
 pub struct SudachiAnalyzer {
     dictionary: JapaneseDictionary,
 }
