@@ -412,7 +412,7 @@ fn main() {
         match command {
             "verbs" => {
                 if parts.len() < 4 {
-                    println!("❌ 使い方: verbs <入力ファイル> <名詞> <出力ディレクトリ>");
+                    println!("使い方: verbs <入力ファイル> <名詞> <出力ディレクトリ>");
                     continue;
                 }
 
@@ -421,24 +421,24 @@ fn main() {
                 let output_dir = parts[3];
 
                 if !Path::new(input_file).exists() {
-                    println!("❌ インプットファイル '{}' が見つかりません。処理をスキップします。", input_file);
+                    println!("ファイル '{}' が見つかりませんでした", input_file);
                     continue;
                 }
 
                 if !Path::new(output_dir).exists() {
-                    println!("❌ アウトプット先ディレクトリ '{}' が見つかりません。事前に作成してください。", output_dir);
+                    println!("フォルダ '{}' が見つかりませんでした", output_dir);
                     continue;
                 }
 
                 if !analyzer.check_noun_validity(target_word) {
-                    println!("❌ '{}' は名詞として認識できませんでした。処理をスキップします。", target_word);
+                    println!("'{}' は名詞として認識できませんでした", target_word);
                     continue;
                 }
 
                 let start = std::time::Instant::now();
                 let results = analyzer.extract_collocations(Path::new(input_file), target_word, WordType::Noun);
                 analyzer.export_to_markdown(target_word, WordType::Noun, &results, Path::new(output_dir));
-                println!("⏱️ かかった時間: {:?}", start.elapsed());
+                println!("処理時間: {:?}", start.elapsed());
             }
             "nouns" => {
                 if parts.len() < 4 {
@@ -451,29 +451,29 @@ fn main() {
                 let output_dir = parts[3];
 
                 if !Path::new(input_file).exists() {
-                    println!("❌ インプットファイル '{}' が見つかりません。処理をスキップします。", input_file);
+                    println!("ファイル '{}' が見つかりませんでした", input_file);
                     continue;
                 }
 
                 if !Path::new(output_dir).exists() {
-                    println!("❌ アウトプット先ディレクトリ '{}' が見つかりません。事前に作成してください。", output_dir);
+                    println!("フォルダ '{}' が見つかりませんでした", output_dir);
                     continue;
                 }
 
                 if !analyzer.check_verb_validity(target_word) {
-                    println!("❌ '{}' は動詞として認識できませんでした。処理をスキップします。", target_word);
+                    println!("'{}' は動詞として認識できませんでした", target_word);
                     continue;
                 }
 
                 let start = std::time::Instant::now();
                 let results = analyzer.extract_collocations(Path::new(input_file), target_word, WordType::Verb);
                 analyzer.export_to_markdown(target_word, WordType::Verb, &results, Path::new(output_dir));
-                println!("⏱️ かかった時間: {:?}", start.elapsed());
+                println!("処理時間: {:?}", start.elapsed());
             }
             "relink" => {
 
                 if parts.len() < 2 {
-                    println!("❌ 使い方: relink <出力ディレクトリ>");
+                    println!("使い方: relink <出力ディレクトリ>");
                     continue;
                 }
 
@@ -481,7 +481,7 @@ fn main() {
                 let base_dir = Path::new(output_dir);
 
                 if !base_dir.exists() {
-                    println!("❌ ディレクトリ '{}' が見つかりません。処理をスキップします。", output_dir);
+                    println!("フォルダ '{}' が見つかりませんでした", output_dir);
                     continue;
                 }
 
@@ -489,17 +489,17 @@ fn main() {
                 let verbs_dir = base_dir.join("verbs");
 
                 if  !nouns_dir.exists() || !verbs_dir.exists() {
-                    println!("❌ nounsとverbsディレクトリが見つかりません。処理をスキップします。");
+                    println!("nounsフォルダとverbsフォルダが見つかりませんでした");
                     continue;
                 }
 
                 let start = std::time::Instant::now();
                 analyzer.process_directory_links_and_weights(base_dir);
-                println!("⏱️ リンクとウェイトの更新にかかった時間: {:?}", start.elapsed());
+                println!("処理時間: {:?}", start.elapsed());
             }
             "search" => {
                 if parts.len() < 3 {
-                    println!("❌ 使い方: search <入力ファイル> <検索文字列>");
+                    println!("使い方: search <入力ファイル> <検索文字列>");
                     continue;
                 }
 
@@ -507,41 +507,30 @@ fn main() {
                 let query = parts[2];
 
                 if !Path::new(input_file).exists() {
-                    println!("❌ 入力ファイル '{}' が見つかりません。処理をスキップします。", input_file);
+                    println!("入力ファイル '{}' が見つかりませんでした", input_file);
                     continue;
                 }
 
-                let file = match File::open(input_file) {
-                    Ok(f) => f,
-                    Err(_) => {
-                        println!("❌ ファイルを開けませんでした。");
-                        continue;
-                    }
+                let Ok(file) = File::open(input_file) else {
+                    println!("ファイルを開けませんでした");
+                    continue;
                 };
 
-                let mmap = unsafe {
-                    match Mmap::map(&file) {
-                        Ok(m) => m,
-                        Err(_) => {
-                            println!("❌ メモリマップに失敗しました。");
-                            continue;
-                        }
-                    }
+                let Ok(mmap) = (unsafe { Mmap::map(&file) }) else {
+                    println!("メモリマップに失敗しました");
+                    continue;
                 };
 
-                let content = match std::str::from_utf8(&mmap) {
-                    Ok(c) => c,
-                    Err(_) => {
-                        println!("❌ ファイルが正しいUTF-8ではありません。");
-                        continue;
-                    }
+                let Ok(content) = std::str::from_utf8(&mmap) else {
+                    println!("ファイルが正しいUTF-8ではありません");
+                    continue;
                 };
 
                 let start = std::time::Instant::now();
                 content.par_lines().filter(|line| line.contains(query)).for_each(|line| println!("{}", line));
-                println!("⏱️ かかった時間: {:?}", start.elapsed());
+                println!("処理時間: {:?}", start.elapsed());
             }
-            _ => println!("❌ 未知のコマンド: '{}'", command),
+            _ => println!("不正なコマンドです: '{}'", command),
         }
     }
 }
