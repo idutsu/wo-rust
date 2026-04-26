@@ -98,7 +98,6 @@ impl SudachiAnalyzer {
                 let dict = m.dictionary_form().to_string();
                 let pos = m.part_of_speech().join(",");
                 let reading = m.reading_form().to_string();
-
                 reading_full.push_str(&reading);
                 morpheme_data_list.push(MorphemeData {
                     surface,
